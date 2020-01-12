@@ -19,10 +19,10 @@ window.addEventListener('scroll', () => {
 
 selectOrder.addEventListener('change', () => {
 	document.body.scrollTop = 0;
-	spinner.style.display = 'block';
+	displayImageBlock.innerHTML = '';
+	spinner.style.display = 'flex';
 	orderValue = selectOrder.value;
 	page = 1;
-	displayImageBlock.innerHTML = '';
 	fetchImages();
 });
 
