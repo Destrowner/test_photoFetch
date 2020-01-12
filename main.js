@@ -5,12 +5,11 @@ const spinner = document.querySelector('.spinner');
 const key = '056c9191c1742aefb28ef2a3d104250693064a07c838bf5f241537df7a46edce';
 let currentPage = 1;
 let orderValue = 'latest';
-let url = 'https://api.unsplash.com/photos?page=' + currentPage + '&per_page=30&order_by=' + orderValue + '&client_id=' + key;
 let fetching = false;
 
 addImages();
 
-async function getImages() {
+async function getImages(url) {
 	fetching = true;
 	const response = await fetch(url);
 	const data = await response.json();
@@ -19,7 +18,7 @@ async function getImages() {
 
 async function addImages() {
 	try {
-		const images = await getImages();
+		const images = await getImages('https://api.unsplash.com/photos?page=' + currentPage + '&per_page=30&order_by=' + orderValue + '&client_id=' + key);
 		spinner.style.display = 'none';
 		images.map((image, index) => {
 			const alt = image.description ? '"' + image.description + '"' : image.alt_description ? '"' + image.alt_description + '"' : "image";
