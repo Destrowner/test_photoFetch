@@ -22,11 +22,7 @@ async function addImages() {
 		spinner.style.display = 'none';
 		images.map((image, index) => {
 			const alt = image.description ? '"' + image.description + '"' : image.alt_description ? '"' + image.alt_description + '"' : "image";
-			if (currentPage === 1 && index < 5) {
-				displayImageBlock.innerHTML += `<img src=${image.urls.regular} alt=${alt} />`;
-			} else {
-				displayImageBlock.innerHTML += `<img data-src=${image.urls.regular} alt=${alt} class="lazy" style="visibility: hidden" />`;
-			}
+			displayImageBlock.innerHTML += `<img data-src=${image.urls.regular} alt=${alt} class="lazy" style="visibility: hidden" />`;
 		});
 		fetching = false;
 		lazyloading();
