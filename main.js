@@ -3,47 +3,53 @@ const selectOrder = document.getElementById('order');
 const spinner = document.querySelector('.spinner');
 
 const key = '056c9191c1742aefb28ef2a3d104250693064a07c838bf5f241537df7a46edce';
-let page = 1;
+let currentPage = 1;
 let orderValue = 'latest';
+let url = 'https://api.unsplash.com/photos?page=' + currentPage + '&per_page=30&order_by=' + orderValue + '&client_id=' + key;
 let fetching = false;
 
-fetchImages();
+addImages();
+
+async function getImages() {
+	fetching = true;
+	const response = await fetch(url);
+	const data = await response.json();
+	return data;
+};
+
+async function addImages() {
+	try {
+		const images = await getImages();
+		spinner.style.display = 'none';
+		images.map((image, index) => {
+			const alt = image.description ? '"' + image.description + '"' : image.alt_description ? '"' + image.alt_description + '"' : "image";
+			if (currentPage === 1 && index < 5) {
+				displayImageBlock.innerHTML += `<img src=${image.urls.regular} alt=${alt} />`;
+			} else {
+				displayImageBlock.innerHTML += `<img data-src=${image.urls.regular} alt=${alt} class="lazy" style="visibility: hidden" />`;
+			}
+		});
+		fetching = false;
+		lazyloading();
+	} catch (error) {
+		alert('Oops! Something went wrong :( Please try again later');
+	}
+}
 
 window.addEventListener('scroll', () => {
 	if ((window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) && fetching === false) {
-		fetching = true;
-		page++;
-		fetchImages();
+		currentPage++;
+		addImages();
 	}
 });
 
 selectOrder.addEventListener('change', () => {
-	document.body.scrollTop = 0;
+	orderValue = selectOrder.value;
 	displayImageBlock.innerHTML = '';
 	spinner.style.display = 'flex';
-	orderValue = selectOrder.value;
-	page = 1;
-	fetchImages();
+	currentPage = 1;
+	addImages();
 });
-
-async function fetchImages() {
-	fetch('https://api.unsplash.com/photos?page=' + page + '&per_page=30&order_by=' + orderValue + '&client_id=' + key)
-		.then(response => response.json())
-		.then(response => {
-			response.map((image, index) => {
-				const alt = image.description ? '"' + image.description + '"' : image.alt_description ? '"' + image.alt_description + '"' : "image";
-				if (page === 1 && index < 5) {
-					displayImageBlock.innerHTML += `<img src=${image.urls.regular} alt=${alt} />`;
-				} else {
-					displayImageBlock.innerHTML += `<img data-src=${image.urls.regular} alt=${alt} class="lazy" style="visibility: hidden" />`;
-				}
-			});
-			fetching = false;
-			lazyloading();	
-			spinner.style.display = 'none';
-		})
-		.catch(error => alert('Oops! Something went wrong :('));
-}
 
 function lazyloading() {
 	if ('IntersectionObserver' in window) {
